@@ -17,13 +17,13 @@ if 'show_signup' not in st.session_state:
     st.session_state.show_signup = False
 
 # Connect to MongoDB
-client = MongoClient(os.getenv("MONGO_URL"))
+client = MongoClient("mongodb+srv://dzheng4m:cGqGXWHSHFQRxSRZ@cluster0.06nr7.mongodb.net/")
 database = client['SecurityFilterDb']
-users_collection = database["Users"]
+users_collection = database["users"]
 
 # Configure the page
 st.set_page_config(
-    page_title="SecureLingo",
+    page_title="safeBrowsing",
     page_icon="🛡️",
     layout="wide"
 )
