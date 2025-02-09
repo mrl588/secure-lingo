@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Diagnostic Button</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script> 
+</head>
+<body class="bg-gray-100 h-screen flex justify-center items-center">
+
+<div class="container mx-auto p-4">
+  <button id="startBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+    Start Diagnostics
+  </button>
+  <button id="diagnosticBtn" class="hidden bg-gray-400 text-gray-600 font-bold py-2 px-4 rounded cursor-not-allowed" enabled>
+    <div class="flex items-center justify-center">
+      <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+      <span class="ml-2">Loading...</span>
+    </div>
+  </button>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

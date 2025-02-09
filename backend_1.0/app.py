@@ -16,9 +16,6 @@ lessons_collection = db.get_collection('Lesson')
 
 
 def fetch_past_lessons():
-    """
-    Fetch all past lessons from MongoDB
-    """
     Lesson = []
     for lesson in lessons_collection.find():
         Lesson.append(lesson.get('content', ''))
@@ -46,20 +43,3 @@ def generate_lessons():
 
 
 print(generate_lessons())
-
-
-# OPENAI API
-# from openai import OpenAI
-# client = OpenAI()
-# completion = client.chat.completions.create(
-#     model="gpt-4o-mini",
-#     messages=[
-#         {"role": "system", "content": "You are a helpful assistant."},
-#         {
-#             "role": "user",
-#             "content": "Write a haiku about recursion in programming."
-#         }
-#     ]
-# )
-
-# print(completion.choices[0].message)
