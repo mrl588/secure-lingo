@@ -1,4 +1,6 @@
-#!/Users/jameschoi/vscode/hacknyu/backend/.venv/bin/python3.11
+#!/bin/sh
+'''exec' "/Users/mocha/Hackathon NYU 2025/hacknyu/backend_2.0/.venv/bin/python3.12" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys

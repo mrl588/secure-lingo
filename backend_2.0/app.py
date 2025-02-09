@@ -26,7 +26,7 @@ class Result(BaseModel):
     title: str
 
 
-client = MongoClient(os.getenv("MONGODB_URI"))
+client = MongoClient(os.getenv("MONGO_URL"))
 db = client.get_database('SecurityFilterDb')
 lessons_collection = db.get_collection('Lesson')
 
