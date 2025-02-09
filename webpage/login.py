@@ -17,7 +17,7 @@ if 'show_signup' not in st.session_state:
     st.session_state.show_signup = False
 
 # Connect to MongoDB
-client = MongoClient("mongodb+srv://dzheng4m:cGqGXWHSHFQRxSRZ@cluster0.06nr7.mongodb.net/")
+client = MongoClient(os.getenv("MONGO_URL"))
 database = client['SecurityFilterDb']
 users_collection = database["users"]
 
