@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 /Pipfile
 /Pipfile.lock
 /Securelingo.html
 /dashboard.py
 /image_scan.py
 /launch.py
+=======
+server/.env.local
+server/.env
+.env
+>>>>>>> 81b3f5c (remove duplicate)
