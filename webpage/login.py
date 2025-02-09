@@ -6,6 +6,7 @@ from datetime import datetime
 import time
 from streamlit_extras.switch_page_button import switch_page
 
+
 # Initialize session state
 if 'authenticated' not in st.session_state:
     st.session_state.authenticated = False
