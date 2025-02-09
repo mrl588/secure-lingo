@@ -1,0 +1,4 @@
+.env
+venv
+prompt.py
+__pycache__
