@@ -19,7 +19,7 @@ if 'show_signup' not in st.session_state:
 # Connect to MongoDB
 client = MongoClient(os.getenv("MONGO_URL"))
 database = client['SecurityFilterDb']
-users_collection = database["users"]
+users_collection = database["Users"]
 
 # Configure the page
 st.set_page_config(
