@@ -4,13 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pytesseract = "*"
-pillow = "*"
-requests = "*"
-openai = "*"
-streamlit_extras = "*"
-streamlit = "*"
-import streamlit.components.v1 = "*"
 pymongo = "*"
 
 [dev-packages]

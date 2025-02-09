@@ -3,6 +3,8 @@ import streamlit as st
 import streamlit.components.v1 as components
 from pymongo import MongoClient
 from datetime import datetime
+import time
+from streamlit_extras.switch_page_button import switch_page
 
 # Initialize session state
 if 'authenticated' not in st.session_state:
@@ -15,7 +17,7 @@ if 'show_signup' not in st.session_state:
     st.session_state.show_signup = False
 
 # Connect to MongoDB
-client = MongoClient(os.getenv("MONGO_URL"))
+client = MongoClient("mongodb+srv://dzheng4m:cGqGXWHSHFQRxSRZ@cluster0.06nr7.mongodb.net/")
 database = client['SecurityFilterDb']
 users_collection = database["users"]
 
@@ -135,72 +137,89 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Functions to toggle form visibility
-def toggle_login():
-    st.session_state.show_login = not st.session_state.show_login
-    st.session_state.show_signup = False
+def handle_login(login_email, login_password):
+    if not login_email.endswith("@gmail.com") or len(login_email) <= 6:
+        st.sidebar.warning("Please enter a valid @gmail.com email address longer than 6 characters.")
+        return False
+    
+    login_email = login_email.lower()
+    user = users_collection.find_one({"email": login_email})
+    
+    if not user:
+        st.sidebar.error("User not found. Please sign up.")
+        return False
+    elif user["password"] != login_password:
+        st.sidebar.error("Incorrect password.")
+        return False
+    else:
+        st.session_state.authenticated = True
+        st.session_state.user_email = login_email
+        st.session_state.show_login = False
+        st.sidebar.success("Logged In! Redirecting...")
 
-def toggle_signup():
-    st.session_state.show_signup = not st.session_state.show_signup
-    st.session_state.show_login = False
+        time.sleep(1)  # Show success message briefly
+        switch_page("dashboard")  # Redirect to Dashboard Page
+        return True
+
+
+def handle_signup(signup_email, signup_password, confirm_password):
+    if not signup_email.endswith("@gmail.com") or len(signup_email) <= 6:
+        st.sidebar.warning("Please enter a valid @gmail.com email address longer than 6 characters.")
+        return False
+    elif signup_password != confirm_password:
+        st.sidebar.warning("Passwords do not match")
+        return False
+    
+    signup_email = signup_email.lower()
+    existing_user = users_collection.find_one({"email": signup_email})
+    if existing_user:
+        st.sidebar.warning("An account with this email already exists. Please log in.")
+        return False
+    
+    users_collection.insert_one({"email": signup_email, "password": signup_password})
+    st.sidebar.success("Account Created!")
+    st.session_state.show_signup = False
+    return True
 
 # Navbar function
 def navbar():
     st.sidebar.markdown("<h1 style='font-size: 40px; color: #00ff00;'>SecureLingo</h1>", unsafe_allow_html=True)
     
     if not st.session_state.authenticated:
-        if st.sidebar.button("Log In"):
-            toggle_login()
-        if st.sidebar.button("Sign Up"):
-            toggle_signup()
+        if st.sidebar.button("Log In", key="nav_login"):
+            st.session_state.show_login = True
+            st.session_state.show_signup = False
+        if st.sidebar.button("Sign Up", key="nav_signup"):
+            st.session_state.show_signup = True
+            st.session_state.show_login = False
 
 # Call navbar
 navbar()
 
 # LOGIN FORM
 if st.session_state.show_login and not st.session_state.authenticated:
-    with st.sidebar:
+    with st.sidebar.form(key="login_form"):
         st.subheader("Login")
         login_email = st.text_input("Email", key="login_email")
         login_password = st.text_input("Password", type="password", key="login_password")
-        if st.button("Submit", key="login_submit"):
-            if not login_email.endswith("@gmail.com") or len(login_email) <= 6:
-                st.warning("Please enter a valid @gmail.com email address longer than 6 characters.")
-            else:
-                login_email = login_email.lower()
-                user = users_collection.find_one({"email": login_email})
-                if not user:
-                    st.error("User not found. Please sign up.")
-                elif user["password"] != login_password:
-                    st.error("Incorrect password.")
-                else:
-                    st.session_state.authenticated = True
-                    st.session_state.user_email = login_email
-                    st.success("Logged In!")
-                    # Set query parameter to indicate authentication
-                    st.experimental_set_query_params(logged_in=True)
+        submit_login = st.form_submit_button("Submit")
+        
+        if submit_login:
+            if handle_login(login_email, login_password):
+                st.rerun()
 
 # SIGN-UP FORM
-if st.session_state.show_signup:
-    with st.sidebar:
+if st.session_state.show_signup and not st.session_state.authenticated:
+    with st.sidebar.form(key="signup_form"):
         st.subheader("Create Account")
         signup_email = st.text_input("Email", key="signup_email")
         signup_password = st.text_input("Password", type="password", key="signup_password")
         confirm_password = st.text_input("Confirm Password", type="password", key="signup_confirm")
-        if st.button("Submit", key="signup_submit"):
-            if not signup_email.endswith("@gmail.com") or len(signup_email) <= 6:
-                st.warning("Please enter a valid @gmail.com email address longer than 6 characters.")
-            elif signup_password != confirm_password:
-                st.warning("Passwords do not match")
-            else:
-                signup_email = signup_email.lower()
-                existing_user = users_collection.find_one({"email": signup_email})
-                if existing_user:
-                    st.warning("An account with this email already exists. Please log in.")
-                else:
-                    users_collection.insert_one({"email": signup_email, "password": signup_password})
-                    st.success("Account Created!")
-                    st.session_state.show_signup = False
+        submit_signup = st.form_submit_button("Submit")
+        
+        if submit_signup:
+            if handle_signup(signup_email, signup_password, confirm_password):
+                st.rerun()
 
 # MAIN CONTENT
 # HERO SECTION
@@ -235,12 +254,9 @@ features_html = """
 """
 st.markdown(features_html, unsafe_allow_html=True)
 
-# Check if the user is authenticated via query params
-query_params = st.query_params
-
-if "logged_in" in query_params and query_params["logged_in"][0] == "true":
+# Check authentication status and display appropriate content
+if st.session_state.authenticated:
     st.write(f"Welcome, {st.session_state.user_email}!")
-    # You can redirect the user to the dashboard here
-    # Display dashboard or other protected content
+    # Add your dashboard or protected content here
 else:
     st.write("Please log in to access the content.")
