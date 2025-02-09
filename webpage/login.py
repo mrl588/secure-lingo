@@ -236,7 +236,7 @@ features_html = """
 st.markdown(features_html, unsafe_allow_html=True)
 
 # Check if the user is authenticated via query params
-query_params = st.experimental_get_query_params()
+query_params = st.query_params
 
 if "logged_in" in query_params and query_params["logged_in"][0] == "true":
     st.write(f"Welcome, {st.session_state.user_email}!")
